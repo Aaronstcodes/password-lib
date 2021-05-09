@@ -1,0 +1,144 @@
+const input_website_field = document.getElementById('input_website_field');
+input_website_field.value = 'www.';
+const input_website_button = document.getElementById('input_website_button');
+const input_password_field = document.getElementById('input_password_field');
+const input_password_button = document.getElementById('input_password_button');
+
+input_website_button.addEventListener('click', generate_password);
+input_password_button.addEventListener('click', copy_password);
+
+window.onload = function(){
+  create_data();
+}
+
+function generate_password(){
+  var result           = '';
+  var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  var charactersLength = characters.length;
+  for ( var i = 0; i < 15; i++ ) {
+     result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+  if(input_website_field.value.length > 4){
+    document.getElementById('input_password_container').style.display = 'flex';
+    document.getElementById('input_website_container').style.display = 'none';
+    input_password_field.value = result;
+  }else{
+    alert('Please Enter A URL');
+  }
+
+}
+
+function copy_password(){
+  input_password_field.select();
+  document.execCommand('copy');
+
+  // store data after copying password
+  store_data({
+      url: input_website_field.value,
+      password: input_password_field.value,
+    });
+
+    setTimeout(function(){
+      document.getElementById('input_password_container').style.display = 'none';
+      document.getElementById('input_website_container').style.display = 'flex';
+      input_website_field.value = 'www.';
+    },1000);
+
+
+}
+
+function store_data(new_data){
+
+  // if the localStorage is empty then create a blank array
+  if(localStorage.getItem("data") == null){
+    localStorage.setItem("data", '[]');
+    data = [];
+    data.push(new_data);
+    localStorage.setItem("data", JSON.stringify(data));
+  }else{
+    // retrieving our data and converting it back into an array
+    var old_data = localStorage.getItem("data");
+    var data = JSON.parse(old_data);
+    data.push(new_data);
+    localStorage.setItem("data", JSON.stringify(data));
+    create_data();
+
+  }
+}
+
+function create_data(){
+  if(localStorage.getItem("data") == null){
+    localStorage.setItem("data", '[]');
+  }
+  data = localStorage.getItem("data");
+  data_array = [];
+  data_array = JSON.parse(data);
+
+  document.getElementById('data_inner_container').innerHTML = '';
+  for(var i, i = 0; i < data_array.length; i++){
+
+    url = data_array[i].url;
+    password = data_array[i].password;
+
+    data_container = document.createElement('div');
+    data_container.setAttribute('id', 'data_container');
+
+    data_website_container = document.createElement('div');
+    data_website_container.setAttribute('id', 'data_website_container');
+
+    data_website_text = document.createElement('p');
+    data_website_text.setAttribute('id', 'data_website_text');
+    data_website_text.innerHTML = url;
+
+    data_website_button = document.createElement('button');
+    data_website_button.setAttribute('id', 'data_website_button');
+    data_website_button.innerHTML = '<i class="fa fa-link"></i>';
+    data_website_button.onclick = function(){
+      event.stopPropagation();
+      if(this.parentElement.firstElementChild.innerHTML.length >= 1){
+        window.open(`https://${this.parentElement.firstElementChild.innerHTML}`, '_blank');
+      }else{
+        alert('no url')
+      }
+    };
+
+    data_password_container = document.createElement('div');
+    data_password_container.setAttribute('id', 'data_password_container');
+
+    data_password_text = document.createElement('input');
+    data_password_text.setAttribute('id', 'data_password_text');
+    data_password_text.value = password;
+
+    data_password_button = document.createElement('button');
+    data_password_button.setAttribute('id', 'data_password_button');
+    data_password_button.innerHTML = '<i class="fa fa-copy"></i>';
+    data_password_button.onclick = function(){
+      this.parentElement.firstElementChild.select();//.select();
+      document.execCommand('copy');
+    };
+
+    document.getElementById('data_inner_container').append(data_container);
+    data_container.append(data_website_container);
+    data_container.append(data_password_container);
+    data_password_container.append(data_password_text);
+    data_password_container.append(data_password_button);
+    data_website_container.append(data_website_text);
+    data_website_container.append(data_website_button);
+
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//
